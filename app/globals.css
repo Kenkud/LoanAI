@@ -5,6 +5,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary: #2563eb; /* blue for applicant actions */
+  --secondary: #16a34a; /* green for provider actions */
 }
 
 @media (prefers-color-scheme: dark) {

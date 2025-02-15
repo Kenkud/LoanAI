@@ -1,101 +1,190 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+import countries from "world-countries";
+
+// Dynamically import `react-world-flags` to avoid SSR issues
+const FlagComponent = dynamic(() => import("react-world-flags"), { ssr: false });
+
+type FormDataType = {
+  amount: string;
+  loanFor: string;
+  employmentStatus: string;
+  collateral: string;
+  approval: string;
+  duration: string;
+  country: string;
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  // Define state for loan search form
+  const [formData, setFormData] = useState<FormDataType>({
+    amount: "",
+    loanFor: "individual",
+    employmentStatus: "employed",
+    collateral: "collateral-free",
+    approval: "normal",
+    duration: "",
+    country: "US", // Default country as code
+  });
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // State for AI response and loading status
+  const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // State for user country and country code
+  const [userCountry, setUserCountry] = useState("US");
+  const [countryCode, setCountryCode] = useState("US");
+
+  // Detect User's Country Automatically on First Load
+  useEffect(() => {
+    fetch("https://ip-api.com/json")
+      .then((res) => res.json())
+      .then((data) => {
+        setUserCountry(data.countryCode);
+        setCountryCode(data.countryCode);
+        setFormData((prev) => ({ ...prev, country: data.countryCode }));
+      })
+      .catch((err) => console.error("Country detection failed:", err));
+  }, []);
+
+  // Handle input and dropdown changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    if (name in formData) {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  // Handle Loan Search Form Submission
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setResponse("");
+
+    try {
+      // Send user search criteria to AI-powered loan search API
+      const res = await fetch("/api/loan-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      setResponse(data.data); // Display AI-generated loan results
+    } catch (error) {
+      setResponse("Error fetching loan information.");
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col justify-center items-center px-4 md:px-8 lg:px-16 xl:px-24 w-full">
+      {/* Country Selector Directly Below Navigation */}
+      <div className="w-full flex justify-end pr-4 md:pr-10">
+        <div className="flex items-center gap-1 bg-white dark:bg-gray-800 px-2 py-1 rounded-md shadow-md text-sm">
+          {/* Display country flag */}
+          {countryCode && (
+            <span className="w-6 h-4">
+              {FlagComponent && (FlagComponent as any)({ country: countryCode, className: "w-6 h-4 rounded-sm" })}
+            </span>
+          )}
+          {/* Country Dropdown (Uses only country codes) */}
+          <select
+            name="country"
+            value={formData.country}
+            onChange={handleChange}
+            className="p-1 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white w-16 text-center">
+            {countries.map((country) => (
+              <option key={country.cca2} value={country.cca2}>
+                {country.cca2}
+              </option>
+            ))}
+          </select>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      </div>
+
+      {/* Page Header with Animated "LoanAI" */}
+      <header className="text-center w-full mt-0">
+        <h1 className="text-4xl md:text-5xl font-bold mb-3">
+          Welcome to{" "}
+          <motion.span
+            className="text-blue-600 dark:text-blue-400"
+            animate={{ color: ["#2563eb", "#f59e0b", "#2563eb"] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            LoanAI
+          </motion.span>
+        </h1>
+        <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 w-full max-w-2xl mx-auto">
+          Find the best loan and credit facility providers near you.
+        </p>
+        <p className="text-lg md:text-xl font-bold text-blue-600 dark:text-blue-400 mt-1">
+          Even better, LET THEM FIND YOU!
+        </p>
+      </header>
+
+      {/* Loan Search Form */}
+      <div className="w-full max-w-lg bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center mt-8">
+        <h2 className="text-lg font-semibold text-blue-600">Search for Loans</h2>
+        <form onSubmit={handleSearch} className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+          {/* Loan Amount */}
+          <input
+            type="number"
+            name="amount"
+            placeholder="Loan Amount"
+            value={formData.amount}
+            onChange={handleChange}
+            className="p-3 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white w-full"
+            required
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+
+          {/* Loan Duration */}
+          <input
+            type="number"
+            name="duration"
+            placeholder="Loan Duration (in months)"
+            value={formData.duration}
+            onChange={handleChange}
+            className="p-3 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white w-full"
+            required
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+          {/* Loan Filters (Dropdowns) */}
+          {[
+            { name: "loanFor", label: "Loan For", options: ["Individual", "Business"] },
+            { name: "employmentStatus", label: "Employment Status", options: ["Employed", "Entrepreneur"] },
+            { name: "collateral", label: "Collateral", options: ["Collateral Loans", "Collateral Free Loans"] },
+            { name: "approval", label: "Approval Time", options: ["Instant", "Normal"] },
+          ].map((field) => (
+            <select
+              key={field.name}
+              name={field.name}
+              value={formData[field.name as keyof FormDataType]} // ✅ Fixed TypeScript Error
+              onChange={handleChange}
+              className="p-3 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white w-full"
+            >
+              {field.options.map((option) => (
+                <option key={option} value={option.toLowerCase().replace(/\s+/g, "-")}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          ))}
+
+          {/* Submit Button (Spans Full Width) */}
+          <button type="submit" className="col-span-2 px-6 py-3 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition-colors" disabled={loading}>
+            {loading ? "Searching..." : "Find Loans"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
