@@ -19,7 +19,7 @@ export default function Contact() {
       <header className="mb-12 text-center">
         <h1 className="text-4xl font-bold text-blue-600 dark:text-blue-400">Contact Us</h1>
         <p className="text-lg mt-4 max-w-2xl text-gray-700 dark:text-gray-300">
-          Have questions or need support? Reach out to us, and we'll get back to you as soon as possible.
+          Have questions or need support? Reach out to us, and we&apos;ll get back to you as soon as possible.
         </p>
       </header>
       <main className="w-full max-w-lg bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">

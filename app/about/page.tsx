@@ -9,7 +9,7 @@ export default function About() {
         <h1 className="text-4xl font-bold text-blue-600 dark:text-blue-400">About LoanAI</h1>
         <p className="text-lg mt-4 max-w-2xl text-gray-700 dark:text-gray-300">
           LoanAI is an intelligent platform designed to help users find the best loan and credit facility providers.
-          Whether you're looking to apply for a loan or offer financial services, LoanAI streamlines the process with AI-driven recommendations.
+          Whether you&apos;re looking to apply for a loan or offer financial services, LoanAI streamlines the process with AI-driven recommendations.
         </p>
       </header>
       <main className="flex gap-6">

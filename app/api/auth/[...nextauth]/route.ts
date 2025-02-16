@@ -1,10 +1,12 @@
-import NextAuth, { AuthOptions, Session, SessionStrategy } from "next-auth";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { NextAuthOptions } from "next-auth";
 
+// Mock user database (Replace with actual DB integration)
 const users: { name: string; email: string; password: string; role: string }[] = [];
 
-export const authOptions: AuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -28,15 +30,15 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ session, token }: { session: Session; token: any }) {
+    async session({ session, token }) {
       if (session.user) {
-        (session.user as { role?: string }).role = token.role; // ✅ Fixed TypeScript error
+        (session.user as { role?: string }).role = token.role as string | undefined;
       }
       return session;
     },
-    async jwt({ token, user }: { token: any; user?: any }) {
+    async jwt({ token, user }) {
       if (user) {
-        token.role = user.role;
+        token.role = (user as unknown as { role: string }).role;
       }
       return token;
     },
@@ -46,9 +48,10 @@ export const authOptions: AuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: "jwt" as SessionStrategy, // ✅ Fixed TypeScript error
+    strategy: "jwt",
   },
 };
 
+// ✅ Corrected export for Next.js API Route
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };

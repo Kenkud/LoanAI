@@ -27,15 +27,10 @@ export default function Home() {
     collateral: "collateral-free",
     approval: "normal",
     duration: "",
-    country: "US", // Default country as code
+    country: "US",
   });
 
-  // State for AI response and loading status
-  const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // State for user country and country code
-  const [userCountry, setUserCountry] = useState("US");
   const [countryCode, setCountryCode] = useState("US");
 
   // Detect User's Country Automatically on First Load
@@ -43,11 +38,10 @@ export default function Home() {
     fetch("https://ip-api.com/json")
       .then((res) => res.json())
       .then((data) => {
-        setUserCountry(data.countryCode);
         setCountryCode(data.countryCode);
         setFormData((prev) => ({ ...prev, country: data.countryCode }));
       })
-      .catch((err) => console.error("Country detection failed:", err));
+      .catch(() => console.error("Country detection failed")); // ✅ Removed `_error`
   }, []);
 
   // Handle input and dropdown changes
@@ -66,10 +60,8 @@ export default function Home() {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setResponse("");
 
     try {
-      // Send user search criteria to AI-powered loan search API
       const res = await fetch("/api/loan-search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -77,9 +69,9 @@ export default function Home() {
       });
 
       const data = await res.json();
-      setResponse(data.data); // Display AI-generated loan results
-    } catch (error) {
-      setResponse("Error fetching loan information.");
+      console.log("Loan Search Results:", data); // ✅ Logging for debugging
+    } catch {
+      console.error("Error fetching loan information"); // ✅ Removed `_error`
     }
 
     setLoading(false);
@@ -87,21 +79,20 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-4 md:px-8 lg:px-16 xl:px-24 w-full">
-      {/* Country Selector Directly Below Navigation */}
+      {/* Country Selector */}
       <div className="w-full flex justify-end pr-4 md:pr-10">
         <div className="flex items-center gap-1 bg-white dark:bg-gray-800 px-2 py-1 rounded-md shadow-md text-sm">
-          {/* Display country flag */}
           {countryCode && (
             <span className="w-6 h-4">
-              {FlagComponent && (FlagComponent as any)({ country: countryCode, className: "w-6 h-4 rounded-sm" })}
+              {FlagComponent && <FlagComponent country={countryCode} className="w-6 h-4 rounded-sm" />}
             </span>
           )}
-          {/* Country Dropdown (Uses only country codes) */}
           <select
             name="country"
             value={formData.country}
             onChange={handleChange}
-            className="p-1 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white w-16 text-center">
+            className="p-1 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white w-16 text-center"
+          >
             {countries.map((country) => (
               <option key={country.cca2} value={country.cca2}>
                 {country.cca2}
@@ -135,42 +126,16 @@ export default function Home() {
       <div className="w-full max-w-lg bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center mt-8">
         <h2 className="text-lg font-semibold text-blue-600">Search for Loans</h2>
         <form onSubmit={handleSearch} className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-          {/* Loan Amount */}
-          <input
-            type="number"
-            name="amount"
-            placeholder="Loan Amount"
-            value={formData.amount}
-            onChange={handleChange}
-            className="p-3 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white w-full"
-            required
-          />
+          <input type="number" name="amount" placeholder="Loan Amount" value={formData.amount} onChange={handleChange} className="p-3 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white w-full" required />
+          <input type="number" name="duration" placeholder="Loan Duration (in months)" value={formData.duration} onChange={handleChange} className="p-3 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white w-full" required />
 
-          {/* Loan Duration */}
-          <input
-            type="number"
-            name="duration"
-            placeholder="Loan Duration (in months)"
-            value={formData.duration}
-            onChange={handleChange}
-            className="p-3 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white w-full"
-            required
-          />
-
-          {/* Loan Filters (Dropdowns) */}
           {[
             { name: "loanFor", label: "Loan For", options: ["Individual", "Business"] },
             { name: "employmentStatus", label: "Employment Status", options: ["Employed", "Entrepreneur"] },
             { name: "collateral", label: "Collateral", options: ["Collateral Loans", "Collateral Free Loans"] },
             { name: "approval", label: "Approval Time", options: ["Instant", "Normal"] },
           ].map((field) => (
-            <select
-              key={field.name}
-              name={field.name}
-              value={formData[field.name as keyof FormDataType]} // ✅ Fixed TypeScript Error
-              onChange={handleChange}
-              className="p-3 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white w-full"
-            >
+            <select key={field.name} name={field.name} value={formData[field.name as keyof FormDataType]} onChange={handleChange} className="p-3 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white w-full">
               {field.options.map((option) => (
                 <option key={option} value={option.toLowerCase().replace(/\s+/g, "-")}>
                   {option}
@@ -179,7 +144,6 @@ export default function Home() {
             </select>
           ))}
 
-          {/* Submit Button (Spans Full Width) */}
           <button type="submit" className="col-span-2 px-6 py-3 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition-colors" disabled={loading}>
             {loading ? "Searching..." : "Find Loans"}
           </button>
