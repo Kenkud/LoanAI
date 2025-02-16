@@ -9,7 +9,7 @@
       "UnauthRoleName": "amplify-loanai-dev-d7763-unauthRole",
       "StackName": "amplify-loanai-dev-d7763",
       "StackId": "arn:aws:cloudformation:us-east-1:180294206991:stack/amplify-loanai-dev-d7763/ac1d65c0-ec19-11ef-94c1-0affe69900f7",
-      "AmplifyAppId": "d2wac8u9gba70x"
+      "AmplifyAppId": "datibs5hvlzhj"
     },
     "categories": {
       "auth": {
