@@ -1,52 +1,28 @@
-"use client";
+import Link from "next/link";
 
-import { useState, useEffect } from "react";
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
-import "./../app/app.css";
-import { Amplify } from "aws-amplify";
-import outputs from "@/amplify_outputs.json";
-import "@aws-amplify/ui-react/styles.css";
-
-Amplify.configure(outputs);
-
-const client = generateClient<Schema>();
-
-export default function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
-
-  function listTodos() {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }
-
-  useEffect(() => {
-    listTodos();
-  }, []);
-
-  function createTodo() {
-    client.models.Todo.create({
-      content: window.prompt("Todo content"),
-    });
-  }
-
+export default function Home() {
   return (
-    <main>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
-        ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/nextjs/start/quickstart/nextjs-app-router-client-components/">
-          Review next steps of this tutorial.
-        </a>
-      </div>
-    </main>
+    <div className="min-h-screen flex flex-col justify-center items-center p-8">
+      <header className="mb-12 text-center">
+        <h1 className="text-5xl font-bold mb-4">Welcome to Loan AI</h1>
+        <p className="text-xl">
+          Find the best loan and credit facility providers or apply for a loan with ease.
+        </p>
+      </header>
+      <main className="flex gap-8">
+        <Link href="/applicant/login">
+          <a className="px-8 py-4 bg-[var(--primary)] text-white rounded-md shadow hover:bg-blue-700 transition-colors">
+            Loan Applicant
+          </a>
+        </Link>
+        <Link href="/provider/login">
+          <a className="px-8 py-4 bg-[var(--secondary)] text-white rounded-md shadow hover:bg-green-700 transition-colors">
+            Loan Provider
+          </a>
+        </Link>
+      </main>
+    </div>
   );
 }
+
+
