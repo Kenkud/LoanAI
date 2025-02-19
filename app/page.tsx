@@ -10,19 +10,19 @@ export default function Home() {
         </p>
       </header>
       <main className="flex gap-8">
-        <Link href="/applicant/login">
-          <a className="px-8 py-4 bg-[var(--primary)] text-white rounded-md shadow hover:bg-blue-700 transition-colors">
-            Loan Applicant
-          </a>
+        <Link
+          href="/applicant/login"
+          className="px-8 py-4 bg-[var(--primary)] text-white rounded-md shadow hover:bg-blue-700 transition-colors"
+        >
+          Loan Applicant
         </Link>
-        <Link href="/provider/login">
-          <a className="px-8 py-4 bg-[var(--secondary)] text-white rounded-md shadow hover:bg-green-700 transition-colors">
-            Loan Provider
-          </a>
+        <Link
+          href="/provider/login"
+          className="px-8 py-4 bg-[var(--secondary)] text-white rounded-md shadow hover:bg-green-700 transition-colors"
+        >
+          Loan Provider
         </Link>
       </main>
     </div>
   );
 }
-
-
