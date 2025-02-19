@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Roboto_Mono } from "next/font/google"; // Use a supported Mono font
 import "./globals.css";
 
-const geistSans = Geist({
+const geistSans = Poppins({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
+const geistMono = Roboto_Mono({  // Replace with an available font
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
@@ -30,3 +30,4 @@ export default function RootLayout({
     </html>
   );
 }
+
