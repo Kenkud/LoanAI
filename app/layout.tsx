@@ -1,32 +1,18 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
-import "./globals.css";
-
-// Import Poppins with a weight of 300 and the latin subset
-const poppins = Poppins({
-  weight: "300",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "My Next.js App",
-  description: "An app using Poppins with weight 300",
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Poppins, Roboto_Mono } from "next/font/google"; // Replace Geist with Poppins
 import Link from "next/link";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["400", "700"], // Specify font weights if needed
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const robotoMono = Roboto_Mono({
+  variable: "--font-roboto-mono",
   subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -39,7 +25,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${poppins.variable} ${robotoMono.variable} antialiased`}>
         {/* Top Navigation */}
         <nav className="w-full bg-gray-100 dark:bg-gray-900 py-2 px-6 flex justify-end space-x-4 text-sm">
           <Link href="/login" className="hover:underline text-gray-700 dark:text-gray-300">
@@ -69,14 +55,6 @@ export default function RootLayout({
         <footer className="w-full bg-gray-100 dark:bg-gray-900 text-center py-4 text-sm text-gray-600 dark:text-gray-400">
           © {new Date().getFullYear()} Loan AI. All rights reserved.
         </footer>
-      </body>
-    </html>
-  );
-}
-
-    <html lang="en">
-      <body className={poppins.className}>
-        {children}
       </body>
     </html>
   );
